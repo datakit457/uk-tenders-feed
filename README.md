@@ -2,6 +2,8 @@
 
 Get new **UK public sector tenders** from the government's two official portals, **Find a Tender** (higher-value contracts, all of the UK) and **Contracts Finder** (England, lower-value), merged into one CSV or JSON-lines feed. Filter by **CPV code, keyword, delivery region, minimum value and SME suitability**. Run it daily with `--new` and you get only the notices you have not seen before: a tender alert you can pipe into Slack, email, Google Sheets or your CRM.
 
+Also available as an Apify Actor (no install, schedulable): [datakit/uk-tenders-feed](https://apify.com/datakit/uk-tenders-feed).
+
 `uk-tenders.mjs` is one file with no dependencies (Node 18+). Data comes from the official Find a Tender and Contracts Finder OCDS APIs (Open Government Licence v3). No login, no API key, no page scraping. Buyer contact details are not output.
 
 ## Who it's for
