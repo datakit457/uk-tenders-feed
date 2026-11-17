@@ -44,7 +44,7 @@ const regionName = (x) => (/^UK[C-N]/.test(x) ? NUTS[x.slice(0, 3)] : x);
 
 async function fetchJson(u) {
   for (let attempt = 1; ; attempt++) {
-    const res = await fetch(u, { headers: { Accept: 'application/json', 'user-agent': 'uk-tenders-cli/1.0 (+https://github.com/datakit457/uk-tenders-feed)' } });
+    const res = await fetch(u, { signal: AbortSignal.timeout(40000), headers: { Accept: 'application/json', 'user-agent': 'uk-tenders-cli/1.0 (+https://github.com/datakit457/uk-tenders-feed)' } });
     if (res.ok) return res.json();
     const text = (await res.text()).slice(0, 300);
     if (res.status === 429 && attempt < 5) {
@@ -121,7 +121,12 @@ for (const src of sources) {
   log.info(`${src === 'cf' ? 'Contracts Finder' : 'Find a Tender'}: ${url}`);
   let n = 0;
   while (url && emitted < maxResults && n < 200) {
-    const data = await fetchJson(url); pages++; n++;
+    let data;
+    try { data = await fetchJson(url); } catch (e) {
+      if (source === 'both') { log.warning(`${src} unreachable (${e.message}); skipping it`); break; }
+      throw e;
+    }
+    pages++; n++;
     for (const r of data.releases ?? []) {
       if (src === 'fts' && !(r.tag ?? []).includes(stage)) continue;
       take(r, src);
